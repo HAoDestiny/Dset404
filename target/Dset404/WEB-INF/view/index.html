@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+</head>
+<body>
+<h1>index</h1>
+<input id="id" type="text"/>
+<button id="findOne" type="button">查询</button>
+<button id="findAll" type="button"> 查询全部</button>
+
+<table id="userTable">
+
+</table>
+</body>
+<!--/** 官网jquery压缩版引用地址 **/-->
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+    $('#findOne').click(function () {
+        var id = $('#id').val();
+        if (id === "") {
+            alert("请输入查询id");
+            return;
+        }
+//        $.getJSON('user/findOne/' + id, function (data) {
+//            alert("姓名：" + data.username + '\n' + "年龄：" + data.age)
+//        });
+
+        $.ajax({
+            type: 'GET'
+            , url: 'user/findOne/' + id
+            , data: ""
+            , dataType: 'json'
+            , success: function (data) {
+                alert("姓名：" + data.username + ", 年龄：" + data.age);
+            },
+            error: function () {
+                alert("错误！")
+            }
+        });
+    });
+
+    $('#findAll').click(function () {
+        $.ajax({
+            type: 'GET'
+            , url: 'user/findAll'
+            , data: ''
+            , dataType: 'json'
+            , success: function (data) {
+                var str = "<tr><td>ID</td><td>姓名</td><td>年龄</td></tr>";
+                var con = '';
+                $.each(data, function (i, n) {
+                    con += '<tr><td>n[i].id</td><td>n.username</td><td>n.age</td></tr>';
+                })
+                $('#userTable').append(str+con);
+            }
+            , error: function () {
+                alert('错误！')
+            }
+        });
+    });
+</script>
+</html>
