@@ -1,58 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:form="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>index</title>
-
     <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <!--/** 官网jquery压缩版引用地址 **/-->
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <!-- 表单序列成json串 -->
+    <script src="//cdn.bootcss.com/jquery.serializeJSON/2.8.1/jquery.serializejson.min.js"></script>
+    <script src="//cdn.bootcss.com/jquery.serializeJSON/2.8.1/jquery.serializejson.js"></script>
+    <script src="statics/layer/layer.js"></script>
 </head>
 <body>
 <h1>index</h1>
-<input id="id" type="text"/>
+<input id="input_id" type="text"/>
 <button id="findOne" type="button">查询</button>
 <button id="findAll" type="button"> 查询全部</button>
-<table id="userTable" class="table table-bordered table-striped">
+<table id="userTable" class="table table-bordered table-striped" hidden="hidden">
     <tr>
         <th>ID</th>
         <th>姓名</th>
         <th>年龄</th>
         <th>操作</th>
     </tr>
-    <!--<tr>-->
-    <!--<td></td>-->
-    <!--<td></td>-->
-    <!--<td></td>-->
-    <!--<td>-->
-    <!--<a href="/admin/users/show/${user.id}" type="button" class="btn btn-sm btn-success">详情</a>-->
-    <!--<a href="/admin/users/update/${user.id}" type="button" class="btn btn-sm btn-warning">修改</a>-->
-    <!--<a href="/admin/users/delete/${user.id}" type="button" class="btn btn-sm btn-danger">删除</a>-->
-    <!--</td>-->
-    <!--</tr>-->
 </table>
+
+<div id="userShow" class="container" hidden="hidden">
+    <h1>用户详情</h1>
+    <hr/>
+    <table id="userDetail" class="table table-bordered table-striped">
+
+    </table>
+</div>
+
+<div id="userUpdate" class="container" hidden="hidden">
+    <h1>更新用户信息</h1>
+    <hr/>
+    <form id="userMessage" commandName="userP" role="form">
+
+    </form>
+</div>
 </body>
-<!--/** 官网jquery压缩版引用地址 **/-->
-<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+
 <script>
+    var index = "";
     $('#findOne').click(function () {
-        var id = $('#id').val();
+        var id = $('#input_id').val();
         if (id === "") {
-            alert("请输入查询id");
+            layer.open({
+                title: '提示',
+                offset: '200px', //设置显示位置坐标
+                icon: 2,
+                shade: 0, // 取消遮罩
+                anim: 6, //动画效果-晃动
+                content: '请输入查询id'
+            });
             return;
         }
 //        $.getJSON('user/findOne/' + id, function (data) {
 //            alert("姓名：" + data.username + '\n' + "年龄：" + data.age)
 //        });
-        var cz = '<a href="/admin/users/show/${user.id}" type="button" class="btn btn-sm btn-success">详情</a> <a href="/admin/users/update/${user.id}" type="button" class="btn btn-sm btn-warning">修改</a> <a href="/admin/users/delete/${user.id}" type="button" class="btn btn-sm btn-danger">删除</a>';
-        var con = '';
         $.ajax({
             type: 'GET'
             , url: 'user/findOne/' + id
             , data: ""
             , dataType: 'json'
             , success: function (data) {
-                $("#userTable  tr:not(:first)").html("");
-                con += "<tr><td>" + data.id + "</td><td>" + data.username + "</td><td>" + data.password + "</td><td>" + cz + "</td></tr>";
-                $('#userTable').append(con);
+                var con = '';
+                if(data.status) {
+                    $('#userTable').show();
+                    $("#userTable  tr:not(:first)").html("");
+                    con += "<tr><td>" + data.value.id + "</td><td>" + data.value.username + "</td><td>" + data.value.age + "</td><td>" + '<a onclick="show(' + data.value.id + ',' + 0 + ')" type="button" class="btn btn-sm btn-success">详情</a> <a onclick="show(' + data.value.id + ',' + 1 + ')" type="button" class="btn btn-sm btn-warning">修改</a> <a onclick="deleteOne(' + data.value.id + ')" type="button" class="btn btn-sm btn-danger">删除</a>' + "</td></tr>";
+                    $('#userTable').append(con);
+                } else {
+                    layer.msg(data.message, {time:2500});
+                }
             },
             error: function () {
                 alert("错误！")
@@ -61,25 +83,134 @@
     });
 
     $('#findAll').click(function () {
-        var con = '';
-        var cz = '<a href="/admin/users/show/${user.id}" type="button" class="btn btn-sm btn-success">详情</a> <a href="/admin/users/update/${user.id}" type="button" class="btn btn-sm btn-warning">修改</a> <a href="/admin/users/delete/${user.id}" type="button" class="btn btn-sm btn-danger">删除</a>';
+        findAll();
+    });
+
+    function show(id, tip) {
+        if(tip === 0) {
+            $("#userDetail").html("");
+            $.getJSON('user/findOne/' + id, function (data) {
+                var content = '<tr><th class="col-3 text-center">ID</th><td>' + data.value.id + '</td></tr>' +
+                    '<tr><th class="col-3 text-center">UserName</th><td>' + data.value.username + '</td></tr>' +
+                    '<tr><th class="col-3 text-center">PassWord</th><td>' + data.value.password + '</td></tr>' +
+                    '<tr><th class="col-3 text-center">Age</th><td>' + data.value.age + '</td></tr>';
+                $('#userDetail').append(content);
+            });
+            index = tool_showDiv('用户详情', 'userShow');
+        }
+        if(tip === 1) {
+            $("#userMessage").html("");
+            $.getJSON('user/findOne/' + id, function (data) {
+                var content =
+                    '<input type="hidden" id="id" name="id" value="'+ id +'"/>' +
+                    '<div class="form-group">' +
+                    '<label for="password">用户名:</label>' +
+                    '<input type="text" class="form-control" id="username" name="username" placeholder="Enter Nickname:" value="'+ data.value.username +'"/>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="password">密码:</label>' +
+                    '<input type="text" class="form-control" id="password" name="password" placeholder="Enter Password:" value="'+ data.value.password +'"/>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="age">年龄:</label>' +
+                    '<input type="text" class="form-control" id="age" name="age" placeholder="Enter AGE:" value="'+ data.value.age +'"/>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<button id="sub_btn" type="button" class="btn btn-sm btn-success">提交</button>' +
+                    '</div>';
+                $('#userMessage').append(content);
+            });
+            index = tool_showDiv('更新', 'userUpdate');
+        }
+    }
+
+    /*提交更新*/
+    $('#userUpdate').on("click", "#sub_btn", function(){
+        update();
+    });
+
+    function update() {
+        var data = JSON.stringify($('#userMessage').serializeJSON());
+        $.ajax({
+            type: 'POST'
+            ,url: 'user/update'
+            ,contentType: 'application/json'
+            ,data: data
+            ,dataType: 'json'
+            ,success: function (data) {
+                layer.msg(data.message, {time:2000});
+                layer.close(index);
+                findAll();
+            }
+            ,error: function () {
+                alert('错误！');
+            }
+        });
+    }
+
+    function findAll() {
         $.ajax({
             type: 'GET'
             , url: 'user/findAll'
             , data: ''
             , dataType: 'json'
             , success: function (data) {
-                //alert(JSON.stringify(data));
+                var con = '';
+                $('#userTable').show();
                 $("#userTable  tr:not(:first)").html("");
                 $.each(data, function (i, value) {
-                    con += "<tr><td>" + value.id + "</td><td>" + value.username + "</td><td>" + value.password + "</td><td>" + cz + "</td></tr>";
+                    con += "<tr><td>" + value.id + "</td><td>" + value.username + "</td><td>" + value.age + "</td><td>" + '<a onclick="show(' + value.id + ',' + 0 + ')" type="button" class="btn btn-sm btn-success">详情</a> <a onclick="show(' + value.id + ',' + 1 + ')" type="button" class="btn btn-sm btn-warning">修改</a> <a onclick="deleteOne(' + value.id + ')" type="button" class="btn btn-sm btn-danger">删除</a>' + "</td></tr>";
                 });
                 $('#userTable').append(con);
             }
             , error: function () {
-                alert('错误！')
+                alert('错误！');
             }
         });
-    });
+    }
+
+    function deleteOne(id) {
+        layer.open({
+            content: '确定要删除?'
+            ,btn: ['确定', '取消']
+            ,yes: function(index, layero){
+                //按钮【确定】的回调
+                $.ajax({
+                    type: 'GET'
+                    ,url: 'user/delete/' + id
+                    ,data:""
+                    ,dataType: "json"
+                    ,success: function (data) {
+                        layer.msg('删除成功', {time:2000});
+                        findAll();
+                    },
+                    error:function () {
+                        alert("错误");
+                    }
+                });
+            }
+            ,btn2: function(index, layero){
+                //按钮【取消】的回调
+                //return false 开启该代码可禁止点击该按钮关闭
+            }
+            ,cancel: function(){
+                //右上角关闭回调
+                //return false 开启该代码可禁止点击该按钮关闭
+            }
+        });
+    }
+
+    function tool_showDiv(title, div_id) {
+        var index = layer.open({
+            type: 1,
+            title: title,
+            shadeClose: true,
+            shade: 0.8,
+            maxmin: true, //开启最大化最小化按钮
+            area: ['893px', '600px'],
+            content: $('#'+ div_id)
+        });
+        return index;
+    }
 </script>
 </html>
