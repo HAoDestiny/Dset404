@@ -3,15 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>index</title>
+
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
 <body>
 <h1>index</h1>
 <input id="id" type="text"/>
 <button id="findOne" type="button">查询</button>
 <button id="findAll" type="button"> 查询全部</button>
-
-<table id="userTable">
-
+<table id="userTable" class="table table-bordered table-striped">
+    <tr>
+        <th>ID</th>
+        <th>姓名</th>
+        <th>年龄</th>
+        <th>操作</th>
+    </tr>
+    <!--<tr>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td></td>-->
+    <!--<td>-->
+    <!--<a href="/admin/users/show/${user.id}" type="button" class="btn btn-sm btn-success">详情</a>-->
+    <!--<a href="/admin/users/update/${user.id}" type="button" class="btn btn-sm btn-warning">修改</a>-->
+    <!--<a href="/admin/users/delete/${user.id}" type="button" class="btn btn-sm btn-danger">删除</a>-->
+    <!--</td>-->
+    <!--</tr>-->
 </table>
 </body>
 <!--/** 官网jquery压缩版引用地址 **/-->
@@ -26,14 +42,17 @@
 //        $.getJSON('user/findOne/' + id, function (data) {
 //            alert("姓名：" + data.username + '\n' + "年龄：" + data.age)
 //        });
-
+        var cz = '<a href="/admin/users/show/${user.id}" type="button" class="btn btn-sm btn-success">详情</a> <a href="/admin/users/update/${user.id}" type="button" class="btn btn-sm btn-warning">修改</a> <a href="/admin/users/delete/${user.id}" type="button" class="btn btn-sm btn-danger">删除</a>';
+        var con = '';
         $.ajax({
             type: 'GET'
             , url: 'user/findOne/' + id
             , data: ""
             , dataType: 'json'
             , success: function (data) {
-                alert("姓名：" + data.username + ", 年龄：" + data.age);
+                $("#userTable  tr:not(:first)").html("");
+                con += "<tr><td>" + data.id + "</td><td>" + data.username + "</td><td>" + data.password + "</td><td>" + cz + "</td></tr>";
+                $('#userTable').append(con);
             },
             error: function () {
                 alert("错误！")
@@ -42,18 +61,20 @@
     });
 
     $('#findAll').click(function () {
+        var con = '';
+        var cz = '<a href="/admin/users/show/${user.id}" type="button" class="btn btn-sm btn-success">详情</a> <a href="/admin/users/update/${user.id}" type="button" class="btn btn-sm btn-warning">修改</a> <a href="/admin/users/delete/${user.id}" type="button" class="btn btn-sm btn-danger">删除</a>';
         $.ajax({
             type: 'GET'
             , url: 'user/findAll'
             , data: ''
             , dataType: 'json'
             , success: function (data) {
-                var str = "<tr><td>ID</td><td>姓名</td><td>年龄</td></tr>";
-                var con = '';
-                $.each(data, function (i, n) {
-                    con += '<tr><td>n[i].id</td><td>n.username</td><td>n.age</td></tr>';
-                })
-                $('#userTable').append(str+con);
+                //alert(JSON.stringify(data));
+                $("#userTable  tr:not(:first)").html("");
+                $.each(data, function (i, value) {
+                    con += "<tr><td>" + value.id + "</td><td>" + value.username + "</td><td>" + value.password + "</td><td>" + cz + "</td></tr>";
+                });
+                $('#userTable').append(con);
             }
             , error: function () {
                 alert('错误！')
