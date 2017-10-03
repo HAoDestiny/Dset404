@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html xmlns:form="http://www.w3.org/1999/xhtml">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>index</title>
@@ -10,12 +11,27 @@
     <script src="//cdn.bootcss.com/jquery.serializeJSON/2.8.1/jquery.serializejson.min.js"></script>
     <script src="//cdn.bootcss.com/jquery.serializeJSON/2.8.1/jquery.serializejson.js"></script>
     <script src="statics/layer/layer.js"></script>
+
+    <script type="text/javascript" charset="utf-8" src="statics/UEditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="statics/UEditor/ueditor.all.min.js"></script>
+    <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+    <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+    <script type="text/javascript" charset="utf-8" src="statics/UEditor/lang/zh-cn/zh-cn.js"></script>
+    <style type="text/css">
+        #editor {
+            width: 800px;
+            height: 500px;
+        }
+        #btns{
+            clear:both;
+        }
+    </style>
 </head>
 <body>
 <h1>index</h1>
 <input id="input_id" type="text"/>
-<button id="findOne" type="button">查询</button>
-<button id="findAll" type="button"> 查询全部</button>
+<button id="findOne" type="button" class="btn btn-sm btn-danger">查询</button>
+<button id="findAll" type="button" class="btn btn-sm btn-danger"> 查询全部</button>
 <table id="userTable" class="table table-bordered table-striped" hidden="hidden">
     <tr>
         <th>ID</th>
@@ -40,6 +56,161 @@
 
     </form>
 </div>
+
+<div>
+    <h1>完整demo</h1>
+    <script id="editor" type="text/plain"></script>
+</div>
+<!--<div id="btns">-->
+    <!--<div>-->
+        <!--<button onclick="getAllHtml()">获得整个html的内容</button>-->
+        <!--<button onclick="getContent()">获得内容</button>-->
+        <!--<button onclick="setContent()">写入内容</button>-->
+        <!--<button onclick="setContent(true)">追加内容</button>-->
+        <!--<button onclick="getContentTxt()">获得纯文本</button>-->
+        <!--<button onclick="getPlainTxt()">获得带格式的纯文本</button>-->
+        <!--<button onclick="hasContent()">判断是否有内容</button>-->
+        <!--<button onclick="setFocus()">使编辑器获得焦点</button>-->
+        <!--<button onmousedown="isFocus(event)">编辑器是否获得焦点</button>-->
+        <!--<button onmousedown="setblur(event)">编辑器失去焦点</button>-->
+
+    <!--</div>-->
+    <!--<div>-->
+        <!--<button onclick="getText()">获得当前选中的文本</button>-->
+        <!--<button onclick="insertHtml()">插入给定的内容</button>-->
+        <!--<button id="enable" onclick="setEnabled()">可以编辑</button>-->
+        <!--<button onclick="setDisabled()">不可编辑</button>-->
+        <!--<button onclick=" UE.getEditor('editor').setHide()">隐藏编辑器</button>-->
+        <!--<button onclick=" UE.getEditor('editor').setShow()">显示编辑器</button>-->
+        <!--<button onclick=" UE.getEditor('editor').setHeight(300)">设置高度为300默认关闭了自动长高</button>-->
+    <!--</div>-->
+
+    <!--<div>-->
+        <!--<button onclick="getLocalData()">获取草稿箱内容</button>-->
+        <!--<button onclick="clearLocalData()">清空草稿箱</button>-->
+    <!--</div>-->
+<!--</div>-->
+
+<!--<div>-->
+    <!--<button onclick="createEditor()">-->
+        <!--创建编辑器-->
+    <!--</button>-->
+    <!--<button onclick="deleteEditor()">-->
+        <!--删除编辑器-->
+    <!--</button>-->
+<!--</div>-->
+
+<script type="text/javascript">
+    //实例化编辑器
+    //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+    var ue = UE.getEditor('editor');
+
+    function isFocus(e) {
+        alert(UE.getEditor('editor').isFocus());
+        UE.dom.domUtils.preventDefault(e)
+    }
+    function setblur(e) {
+        UE.getEditor('editor').blur();
+        UE.dom.domUtils.preventDefault(e)
+    }
+    function insertHtml() {
+        var value = prompt('插入html代码', '');
+        UE.getEditor('editor').execCommand('insertHtml', value)
+    }
+    function createEditor() {
+        enableBtn();
+        UE.getEditor('editor');
+    }
+    function getAllHtml() {
+        alert(UE.getEditor('editor').getAllHtml())
+    }
+    function getContent() {
+        var arr = [];
+        arr.push("使用editor.getContent()方法可以获得编辑器的内容");
+        arr.push("内容为：");
+        arr.push(UE.getEditor('editor').getContent());
+        alert(arr.join("\n"));
+    }
+    function getPlainTxt() {
+        var arr = [];
+        arr.push("使用editor.getPlainTxt()方法可以获得编辑器的带格式的纯文本内容");
+        arr.push("内容为：");
+        arr.push(UE.getEditor('editor').getPlainTxt());
+        alert(arr.join('\n'))
+    }
+    function setContent(isAppendTo) {
+        var arr = [];
+        arr.push("使用editor.setContent('欢迎使用ueditor')方法可以设置编辑器的内容");
+        UE.getEditor('editor').setContent('欢迎使用ueditor', isAppendTo);
+        alert(arr.join("\n"));
+    }
+    function setDisabled() {
+        UE.getEditor('editor').setDisabled('fullscreen');
+        disableBtn("enable");
+    }
+
+    function setEnabled() {
+        UE.getEditor('editor').setEnabled();
+        enableBtn();
+    }
+
+    function getText() {
+        //当你点击按钮时编辑区域已经失去了焦点，如果直接用getText将不会得到内容，所以要在选回来，然后取得内容
+        var range = UE.getEditor('editor').selection.getRange();
+        range.select();
+        var txt = UE.getEditor('editor').selection.getText();
+        alert(txt)
+    }
+
+    function getContentTxt() {
+        var arr = [];
+        arr.push("使用editor.getContentTxt()方法可以获得编辑器的纯文本内容");
+        arr.push("编辑器的纯文本内容为：");
+        arr.push(UE.getEditor('editor').getContentTxt());
+        alert(arr.join("\n"));
+    }
+    function hasContent() {
+        var arr = [];
+        arr.push("使用editor.hasContents()方法判断编辑器里是否有内容");
+        arr.push("判断结果为：");
+        arr.push(UE.getEditor('editor').hasContents());
+        alert(arr.join("\n"));
+    }
+    function setFocus() {
+        UE.getEditor('editor').focus();
+    }
+    function deleteEditor() {
+        disableBtn();
+        UE.getEditor('editor').destroy();
+    }
+    function disableBtn(str) {
+        var div = document.getElementById('btns');
+        var btns = UE.dom.domUtils.getElementsByTagName(div, "button");
+        for (var i = 0, btn; btn = btns[i++];) {
+            if (btn.id == str) {
+                UE.dom.domUtils.removeAttributes(btn, ["disabled"]);
+            } else {
+                btn.setAttribute("disabled", "true");
+            }
+        }
+    }
+    function enableBtn() {
+        var div = document.getElementById('btns');
+        var btns = UE.dom.domUtils.getElementsByTagName(div, "button");
+        for (var i = 0, btn; btn = btns[i++];) {
+            UE.dom.domUtils.removeAttributes(btn, ["disabled"]);
+        }
+    }
+
+    function getLocalData() {
+        alert(UE.getEditor('editor').execCommand("getlocaldata"));
+    }
+
+    function clearLocalData() {
+        UE.getEditor('editor').execCommand("clearlocaldata");
+        alert("已清空草稿箱")
+    }
+</script>
 </body>
 
 <script>
@@ -63,17 +234,17 @@
         $.ajax({
             type: 'GET'
             , url: 'user/findOne/' + id
-            , data: ""
+            , data: ''
             , dataType: 'json'
             , success: function (data) {
                 var con = '';
-                if(data.status) {
+                if (data.status) {
                     $('#userTable').show();
                     $("#userTable  tr:not(:first)").html("");
                     con += "<tr><td>" + data.value.id + "</td><td>" + data.value.username + "</td><td>" + data.value.age + "</td><td>" + '<a onclick="show(' + data.value.id + ',' + 0 + ')" type="button" class="btn btn-sm btn-success">详情</a> <a onclick="show(' + data.value.id + ',' + 1 + ')" type="button" class="btn btn-sm btn-warning">修改</a> <a onclick="deleteOne(' + data.value.id + ')" type="button" class="btn btn-sm btn-danger">删除</a>' + "</td></tr>";
                     $('#userTable').append(con);
                 } else {
-                    layer.msg(data.message, {time:2500});
+                    layer.msg(data.message, {time: 2500});
                 }
             },
             error: function () {
@@ -87,7 +258,7 @@
     });
 
     function show(id, tip) {
-        if(tip === 0) {
+        if (tip === 0) {
             $("#userDetail").html("");
             $.getJSON('user/findOne/' + id, function (data) {
                 var content = '<tr><th class="col-3 text-center">ID</th><td>' + data.value.id + '</td></tr>' +
@@ -98,22 +269,22 @@
             });
             index = tool_showDiv('用户详情', 'userShow');
         }
-        if(tip === 1) {
+        if (tip === 1) {
             $("#userMessage").html("");
             $.getJSON('user/findOne/' + id, function (data) {
                 var content =
-                    '<input type="hidden" id="id" name="id" value="'+ id +'"/>' +
+                    '<input type="hidden" id="id" name="id" value="' + id + '"/>' +
                     '<div class="form-group">' +
                     '<label for="password">用户名:</label>' +
-                    '<input type="text" class="form-control" id="username" name="username" placeholder="Enter Nickname:" value="'+ data.value.username +'"/>' +
+                    '<input type="text" class="form-control" id="username" name="username" placeholder="Enter Nickname:" value="' + data.value.username + '"/>' +
                     '</div>' +
                     '<div class="form-group">' +
                     '<label for="password">密码:</label>' +
-                    '<input type="text" class="form-control" id="password" name="password" placeholder="Enter Password:" value="'+ data.value.password +'"/>' +
+                    '<input type="text" class="form-control" id="password" name="password" placeholder="Enter Password:" value="' + data.value.password + '"/>' +
                     '</div>' +
                     '<div class="form-group">' +
                     '<label for="age">年龄:</label>' +
-                    '<input type="text" class="form-control" id="age" name="age" placeholder="Enter AGE:" value="'+ data.value.age +'"/>' +
+                    '<input type="text" class="form-control" id="age" name="age" placeholder="Enter AGE:" value="' + data.value.age + '"/>' +
                     '</div>' +
                     '<div class="form-group">' +
                     '<button id="sub_btn" type="button" class="btn btn-sm btn-success">提交</button>' +
@@ -125,7 +296,7 @@
     }
 
     /*提交更新*/
-    $('#userUpdate').on("click", "#sub_btn", function(){
+    $('#userUpdate').on("click", "#sub_btn", function () {
         update();
     });
 
@@ -133,16 +304,16 @@
         var data = JSON.stringify($('#userMessage').serializeJSON());
         $.ajax({
             type: 'POST'
-            ,url: 'user/update'
-            ,contentType: 'application/json'
-            ,data: data
-            ,dataType: 'json'
-            ,success: function (data) {
-                layer.msg(data.message, {time:2000});
+            , url: 'user/update'
+            , contentType: 'application/json'
+            , data: data
+            , dataType: 'json'
+            , success: function (data) {
+                layer.msg(data.message, {time: 2000});
                 layer.close(index);
                 findAll();
             }
-            ,error: function () {
+            , error: function () {
                 alert('错误！');
             }
         });
@@ -172,28 +343,28 @@
     function deleteOne(id) {
         layer.open({
             content: '确定要删除?'
-            ,btn: ['确定', '取消']
-            ,yes: function(index, layero){
+            , btn: ['确定', '取消']
+            , yes: function (index, layero) {
                 //按钮【确定】的回调
                 $.ajax({
                     type: 'GET'
-                    ,url: 'user/delete/' + id
-                    ,data:""
-                    ,dataType: "json"
-                    ,success: function (data) {
-                        layer.msg('删除成功', {time:2000});
+                    , url: 'user/delete/' + id
+                    , data: ""
+                    , dataType: "json"
+                    , success: function (data) {
+                        layer.msg(data.message, {time: 2000});
                         findAll();
                     },
-                    error:function () {
+                    error: function () {
                         alert("错误");
                     }
                 });
             }
-            ,btn2: function(index, layero){
+            , btn2: function (index, layero) {
                 //按钮【取消】的回调
                 //return false 开启该代码可禁止点击该按钮关闭
             }
-            ,cancel: function(){
+            , cancel: function () {
                 //右上角关闭回调
                 //return false 开启该代码可禁止点击该按钮关闭
             }
@@ -208,7 +379,7 @@
             shade: 0.8,
             maxmin: true, //开启最大化最小化按钮
             area: ['893px', '600px'],
-            content: $('#'+ div_id)
+            content: $('#' + div_id)
         });
         return index;
     }
