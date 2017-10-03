@@ -36,7 +36,7 @@ public class UserController {
 
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     public @ResponseBody List<Story_user> findAll() {
-        System.out.println("findAll- - - test - - -" );
+        System.out.println("findAll- - - - - -" );
         return userService.findAll();
     }
 
